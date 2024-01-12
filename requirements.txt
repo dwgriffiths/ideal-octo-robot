@@ -1,0 +1,6 @@
+apache-airflow[s3, postgres]
+loguru
+pandas
+pre-commit
+scrapy
+SQLAlchemy
