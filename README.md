@@ -1,46 +1,51 @@
 # ideal-octo-robot
 
+## Getting Started
 
-
-install anaconda for windows
-
+### Anaconda
+1. Download and install [Anaconda for Windows](https://www.anaconda.com/download).
+2. Within the anaconda prompt, create a new environment called `airflow` and activate it:
+```
 conda create -n airflow python=3.8 pip setuptools git
 conda activate airflow
+```
 
-git clone repo
+### The Code
+1. Fork this repostory.
+2. Clone your forked repository and `cd` into it.
+3. Install the packages in the requirements folder:
+```
+pip install -r requirements.txt
+```
+4. Install `pre-commit`
+```
+pre-commit install
+```
+4. Check to see if the code works:
+```
+python .\src\scrapes\movies\scrape.py
+python .\src\scrapes\movies\etl.py
+```
 
-cd repo
-
-pip install -r requirements
-
-
-
-
-1. Fork this repository.
-2. Clone the forked repository (through VSCode to add it to your workspace).
-3. Install Docker Desktop For Windows https://www.docker.com/products/docker-desktop/
-  - You may need to enable Windows Subsystem for Linux
-
-
-4. cd into this repo
-
+### Airflow
+This is done using the instructions found [here](https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html).
+1. Install [Docker Desktop For Windows](https://www.docker.com/products/docker-desktop/).
+    - Probably need to enable Windows Subsystem for Linux.
+2. Within the repository directory, build the Dockerfile:
+```
 docker-compose build
+```
+3. Build the airflow instance
+```
 docker compose up airflow-init
+```
+4. Start airflow
+```
 docker compose up
+```
+5. Wait for airflow to load at `localhost:/8080` in your browser.
 
-wait to load
-localhost:/8080
-
-https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html
-
-Ctrl-C to quit
-
-
-mamba create -n airflow python=3.8 pip setuptools git
-
-
-
-
-
-
-Cron schedule https://crontab.guru/every-5-minutes
+### Notes
+- `src` contains the source code.
+- `dags` contains the airflow DAGs.
+- `data` is where the raw data will be saved.

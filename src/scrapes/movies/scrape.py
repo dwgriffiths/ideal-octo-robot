@@ -11,13 +11,14 @@ class SpiderExample(scrapy.Spider):
     name = "movies"
     timestamp = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
 
-    # This is found by looking at the network traffic
-    ajax = (
-        "https://www.scrapethissite.com/pages/ajax-javascript/?ajax=true&year="
-    )
+    url_main = "http://www.scrapethissite.com/pages/ajax-javascript/"
+    url_ajax = url_main + "?ajax=true&year="
 
     @property
     def path_data(self) -> pathlib.Path:
+        """
+        So that we can access the data folder
+        """
         path = pathlib.Path(__file__).parent
         for i in range(20):
             if (path / "data/").exists():
@@ -26,12 +27,16 @@ class SpiderExample(scrapy.Spider):
         raise FileNotFoundError()
 
     def start_requests(self):
+
+        # First navigate to the main page to
+        # get all years
         yield scrapy.Request(
-            url="http://www.scrapethissite.com/pages/ajax-javascript/",
+            url=self.url_main,
             callback=self.parse,
         )
 
     def parse(self, response):
+
         # Get all years
         years = response.xpath(
             "//a[contains(@class, 'year-link')]/@id"
@@ -42,9 +47,9 @@ class SpiderExample(scrapy.Spider):
         for year in years:
 
             # Use the ajax request to get the data in json format
-            logger.info(f"Requesting AJAX request for year {year}")
+            logger.info(f"Requesting AJAX json response for year {year}")
             yield scrapy.Request(
-                url=self.ajax + year,
+                url=self.url_ajax + year,
                 callback=self.upload_json,
                 headers={"Content-Type": "application/json"},
                 meta={"year": year},
@@ -54,11 +59,13 @@ class SpiderExample(scrapy.Spider):
         data = response.json()
         assert data, "Data not found"
 
+        # Create path
         year = response.meta["year"]
         upload_dir = self.path_data / year
         upload_dir.mkdir(parents=True, exist_ok=True)
         upload_path = upload_dir / "content.json"
 
+        # Save data
         logger.info(f"Uploading to {upload_path.resolve()}")
         with open(str(upload_path.resolve()), "w") as f:
             json.dump(data, f)
