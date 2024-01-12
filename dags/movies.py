@@ -2,7 +2,6 @@ import datetime
 
 from airflow import DAG
 from airflow.operators.bash import BashOperator
-from airflow.operators.python import PythonOperator
 
 name = "movies"
 with DAG(
@@ -19,16 +18,10 @@ with DAG(
         bash_command="python /opt/airflow/src/scrapes/movies/scrape.py",
     )
 
-    etl = PythonOperator(
+    etl = BashOperator(
         dag=dag,
         task_id=f"etl_{name}",
-        python_callable=lambda: print("hello"),
+        bash_command="python /opt/airflow/src/scrapes/movies/etl.py",
     )
 
-    qc = PythonOperator(
-        dag=dag,
-        task_id=f"qc_{name}",
-        python_callable=lambda: print("hello"),
-    )
-
-    scrape >> etl >> qc
+    scrape >> etl
